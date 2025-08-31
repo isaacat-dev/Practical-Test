@@ -23,7 +23,7 @@
             cpf == "88888888888" ||
             cpf == "99999999999")
             return false;
-        
+
         add = 0;
         for (i = 0; i < 9; i++)
             add += parseInt(cpf.charAt(i)) * (10 - i);
@@ -32,7 +32,7 @@
             rev = 0;
         if (rev != parseInt(cpf.charAt(9)))
             return false;
-        
+
         add = 0;
         for (i = 0; i < 10; i++)
             add += parseInt(cpf.charAt(i)) * (11 - i);
@@ -44,62 +44,73 @@
         return true;
     }
 
-    $('#formCadastro').submit(function (e) {
-        e.preventDefault();
-        
-        // Validação do CPF
-        var cpf = $('#CPF').val();
-        if (!validarCPF(cpf)) {
-            ModalDialog("Erro de validação", "CPF inválido");
-            return false;
-        }
+    if (!$('#formCadastro').data('submit-handler-attached')) {
+        $('#formCadastro').data('submit-handler-attached', true);
 
-        // Coleta os beneficiários
-        var beneficiariosData = typeof beneficiarios !== 'undefined' ? beneficiarios.map(b => ({
-            Id: b.id || 0,
-            CPF: b.cpf,
-            Nome: b.nome,
-            IdCliente: 0
-        })) : [];
-        
-        $.ajax({
-            url: urlPost,
-            method: "POST",
-            data: {
-                "NOME": $(this).find("#Nome").val(),
-                "CEP": $(this).find("#CEP").val(),
-                "CPF": $(this).find("#CPF").val(),
-                "Email": $(this).find("#Email").val(),
-                "Sobrenome": $(this).find("#Sobrenome").val(),
-                "Nacionalidade": $(this).find("#Nacionalidade").val(),
-                "Estado": $(this).find("#Estado").val(),
-                "Cidade": $(this).find("#Cidade").val(),
-                "Logradouro": $(this).find("#Logradouro").val(),
-                "Telefone": $(this).find("#Telefone").val(),
-                "Beneficiarios": beneficiariosData
-            },
-            error:
-            function (r) {
-                if (r.status == 400)
-                    ModalDialog("Ocorreu um erro", r.responseJSON);
-                else if (r.status == 500)
-                    ModalDialog("Ocorreu um erro", "Ocorreu um erro interno no servidor.");
-            },
-            success:
-            function (r) {
-                ModalDialog("Sucesso!", r)
-                $("#formCadastro")[0].reset();
-                if (typeof beneficiarios !== 'undefined') {
-                    beneficiarios = [];
-                    if (typeof atualizarTabelaBeneficiarios === 'function') {
-                        atualizarTabelaBeneficiarios();
+        $('#formCadastro').off('submit').on('submit', function (e) {
+            e.preventDefault();
+
+            if ($(this).data('submitting')) {
+                return false;
+            }
+            $(this).data('submitting', true);
+
+            // Validação do CPF
+            var cpf = $('#CPF').val();
+            if (!validarCPF(cpf)) {
+                $(this).data('submitting', false);
+                ModalDialog("Erro de validação", "CPF inválido");
+                return false;
+            }
+
+            // Coleta os beneficiários
+            var beneficiariosData = typeof beneficiarios !== 'undefined' ? beneficiarios.map(b => ({
+                Id: b.id || 0,
+                CPF: b.cpf,
+                Nome: b.nome,
+                IdCliente: 0
+            })) : [];
+
+            var $form = $(this);
+
+            $.ajax({
+                url: urlPost,
+                method: "POST",
+                data: {
+                    "NOME": $form.find("#Nome").val(),
+                    "CEP": $form.find("#CEP").val(),
+                    "CPF": $form.find("#CPF").val(),
+                    "Email": $form.find("#Email").val(),
+                    "Sobrenome": $form.find("#Sobrenome").val(),
+                    "Nacionalidade": $form.find("#Nacionalidade").val(),
+                    "Estado": $form.find("#Estado").val(),
+                    "Cidade": $form.find("#Cidade").val(),
+                    "Logradouro": $form.find("#Logradouro").val(),
+                    "Telefone": $form.find("#Telefone").val(),
+                    "Beneficiarios": beneficiariosData
+                },
+                error: function (r) {
+                    $form.data('submitting', false);
+                    if (r.status == 400)
+                        ModalDialog("Ocorreu um erro", r.responseJSON);
+                    else if (r.status == 500)
+                        ModalDialog("Ocorreu um erro", "Ocorreu um erro interno no servidor.");
+                },
+                success: function (r) {
+                    $form.data('submitting', false);
+                    ModalDialog("Sucesso!", r);
+                    $("#formCadastro")[0].reset();
+                    if (typeof beneficiarios !== 'undefined') {
+                        beneficiarios = [];
+                        if (typeof atualizarTabelaBeneficiarios === 'function') {
+                            atualizarTabelaBeneficiarios();
+                        }
                     }
                 }
-            }
+            });
         });
-    })
-    
-})
+    }
+});
 
 function ModalDialog(titulo, texto) {
     var random = Math.random().toString().replace('.', '');

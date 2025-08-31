@@ -24,7 +24,7 @@ $(document).ready(function () {
             cpf == "88888888888" ||
             cpf == "99999999999")
             return false;
-        
+
         var add = 0;
         for (var i = 0; i < 9; i++)
             add += parseInt(cpf.charAt(i)) * (10 - i);
@@ -33,7 +33,7 @@ $(document).ready(function () {
             rev = 0;
         if (rev != parseInt(cpf.charAt(9)))
             return false;
-        
+
         add = 0;
         for (var i = 0; i < 10; i++)
             add += parseInt(cpf.charAt(i)) * (11 - i);
@@ -172,61 +172,4 @@ $(document).ready(function () {
         }
     };
 
-    // Intercepta o submit do formulário para incluir beneficiários
-    var originalSubmit = $('#formCadastro').submit;
-    $('#formCadastro').off('submit').on('submit', function (e) {
-        e.preventDefault();
-        
-        // Atualiza o campo hidden com os beneficiários
-        $('#hiddenBeneficiarios').val(JSON.stringify(beneficiarios));
-        
-        // Chama a função original de submit
-        submitFormulario();
-    });
-
-    function submitFormulario() {
-        // Validação do CPF do cliente
-        var cpf = $('#CPF').val();
-        if (!validarCPF(cpf)) {
-            ModalDialog("Erro de validação", "CPF do cliente inválido");
-            return false;
-        }
-
-        var beneficiariosData = beneficiarios.map(b => ({
-            Id: b.id || 0,
-            CPF: b.cpf,
-            Nome: b.nome,
-            IdCliente: 0
-        }));
-        
-        $.ajax({
-            url: urlPost,
-            method: "POST",
-            data: {
-                "NOME": $('#Nome').val(),
-                "CEP": $('#CEP').val(),
-                "CPF": $('#CPF').val(),
-                "Email": $('#Email').val(),
-                "Sobrenome": $('#Sobrenome').val(),
-                "Nacionalidade": $('#Nacionalidade').val(),
-                "Estado": $('#Estado').val(),
-                "Cidade": $('#Cidade').val(),
-                "Logradouro": $('#Logradouro').val(),
-                "Telefone": $('#Telefone').val(),
-                "Beneficiarios": beneficiariosData
-            },
-            error: function (r) {
-                if (r.status == 400)
-                    ModalDialog("Erro", r.responseJSON);
-                else if (r.status == 500)
-                    ModalDialog("Erro", "Ocorreu um erro interno no servidor.");
-            },
-            success: function (r) {
-                ModalDialog("Sucesso", r);
-                $("#formCadastro")[0].reset();
-                beneficiarios = [];
-                atualizarTabelaBeneficiarios();
-            }
-        });
-    }
 });

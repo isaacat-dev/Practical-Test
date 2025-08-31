@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using FI.AtividadeEntrevista.DML;
+using FI.AtividadeEntrevista.Utils;
 
 namespace WebAtividadeEntrevista.Controllers
 {
@@ -26,6 +27,7 @@ namespace WebAtividadeEntrevista.Controllers
         public JsonResult Incluir(ClienteModel model)
         {
             BoCliente bo = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
             
             if (!this.ModelState.IsValid)
             {
@@ -36,6 +38,13 @@ namespace WebAtividadeEntrevista.Controllers
                 Response.StatusCode = 400;
                 return Json(string.Join(Environment.NewLine, erros));
             }
+            
+            // Verifica se o CPF já existe
+            if (bo.VerificarExistencia(CpfValidador.RemoverFormatacao(model.CPF)))
+            {
+                Response.StatusCode = 400;
+                return Json("CPF já cadastrado no sistema");
+            }
             else
             {
                 
@@ -43,6 +52,7 @@ namespace WebAtividadeEntrevista.Controllers
                 {                    
                     CEP = model.CEP,
                     Cidade = model.Cidade,
+                    CPF = CpfValidador.RemoverFormatacao(model.CPF),
                     Email = model.Email,
                     Estado = model.Estado,
                     Logradouro = model.Logradouro,
@@ -52,6 +62,20 @@ namespace WebAtividadeEntrevista.Controllers
                     Telefone = model.Telefone
                 });
 
+                // Salva os beneficiários se existirem
+                if (model.Beneficiarios != null && model.Beneficiarios.Any())
+                {
+                    foreach (var beneficiario in model.Beneficiarios)
+                    {
+                        beneficiario.IdCliente = model.Id;
+                        boBeneficiario.Incluir(new Beneficiario()
+                        {
+                            CPF = CpfValidador.RemoverFormatacao(beneficiario.CPF),
+                            Nome = beneficiario.Nome,
+                            IdCliente = beneficiario.IdCliente
+                        });
+                    }
+                }
            
                 return Json("Cadastro efetuado com sucesso");
             }
@@ -61,6 +85,7 @@ namespace WebAtividadeEntrevista.Controllers
         public JsonResult Alterar(ClienteModel model)
         {
             BoCliente bo = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
        
             if (!this.ModelState.IsValid)
             {
@@ -71,6 +96,16 @@ namespace WebAtividadeEntrevista.Controllers
                 Response.StatusCode = 400;
                 return Json(string.Join(Environment.NewLine, erros));
             }
+            
+            // Verifica se o CPF já existe para outro cliente
+            var clienteExistente = bo.Consultar(model.Id);
+            var cpfSemFormatacao = CpfValidador.RemoverFormatacao(model.CPF);
+            
+            if (clienteExistente.CPF != cpfSemFormatacao && bo.VerificarExistencia(cpfSemFormatacao))
+            {
+                Response.StatusCode = 400;
+                return Json("CPF já cadastrado no sistema");
+            }
             else
             {
                 bo.Alterar(new Cliente()
@@ -78,6 +113,7 @@ namespace WebAtividadeEntrevista.Controllers
                     Id = model.Id,
                     CEP = model.CEP,
                     Cidade = model.Cidade,
+                    CPF = cpfSemFormatacao,
                     Email = model.Email,
                     Estado = model.Estado,
                     Logradouro = model.Logradouro,
@@ -86,6 +122,24 @@ namespace WebAtividadeEntrevista.Controllers
                     Sobrenome = model.Sobrenome,
                     Telefone = model.Telefone
                 });
+
+                // Remove todos os beneficiários existentes e reinsere
+                boBeneficiario.ExcluirPorCliente(model.Id);
+
+                // Salva os beneficiários se existirem
+                if (model.Beneficiarios != null && model.Beneficiarios.Any())
+                {
+                    foreach (var beneficiario in model.Beneficiarios)
+                    {
+                        beneficiario.IdCliente = model.Id;
+                        boBeneficiario.Incluir(new Beneficiario()
+                        {
+                            CPF = CpfValidador.RemoverFormatacao(beneficiario.CPF),
+                            Nome = beneficiario.Nome,
+                            IdCliente = beneficiario.IdCliente
+                        });
+                    }
+                }
                                
                 return Json("Cadastro alterado com sucesso");
             }
@@ -95,6 +149,7 @@ namespace WebAtividadeEntrevista.Controllers
         public ActionResult Alterar(long id)
         {
             BoCliente bo = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
             Cliente cliente = bo.Consultar(id);
             Models.ClienteModel model = null;
 
@@ -105,6 +160,7 @@ namespace WebAtividadeEntrevista.Controllers
                     Id = cliente.Id,
                     CEP = cliente.CEP,
                     Cidade = cliente.Cidade,
+                    CPF = CpfValidador.AplicarFormatacao(cliente.CPF),
                     Email = cliente.Email,
                     Estado = cliente.Estado,
                     Logradouro = cliente.Logradouro,
@@ -113,6 +169,16 @@ namespace WebAtividadeEntrevista.Controllers
                     Sobrenome = cliente.Sobrenome,
                     Telefone = cliente.Telefone
                 };
+
+                // Carrega os beneficiários
+                var beneficiarios = boBeneficiario.ListarPorCliente(id);
+                model.Beneficiarios = beneficiarios.Select(b => new BeneficiarioModel()
+                {
+                    Id = b.Id,
+                    CPF = CpfValidador.AplicarFormatacao(b.CPF),
+                    Nome = b.Nome,
+                    IdCliente = b.IdCliente
+                }).ToList();
 
             
             }

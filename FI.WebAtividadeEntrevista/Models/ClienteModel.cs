@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using WebAtividadeEntrevista.Attributes;
 
 namespace WebAtividadeEntrevista.Models
 {
@@ -24,6 +25,13 @@ namespace WebAtividadeEntrevista.Models
         /// </summary>
         [Required]
         public string Cidade { get; set; }
+
+        /// <summary>
+        /// CPF
+        /// </summary>
+        [Required(ErrorMessage = "CPF é obrigatório")]
+        [CpfValidation(ErrorMessage = "CPF inválido")]
+        public string CPF { get; set; }
 
         /// <summary>
         /// E-mail
@@ -67,5 +75,14 @@ namespace WebAtividadeEntrevista.Models
         /// </summary>
         public string Telefone { get; set; }
 
+        /// <summary>
+        /// Lista de Beneficiários
+        /// </summary>
+        public List<BeneficiarioModel> Beneficiarios { get; set; }
+
+        public ClienteModel()
+        {
+            Beneficiarios = new List<BeneficiarioModel>();
+        }
     }    
 }

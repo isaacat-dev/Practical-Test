@@ -1,18 +1,24 @@
-﻿
-<form id="formCadastro" method="post">
+﻿<form id="formCadastro" method="post">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <div class="form-group">
                 <label for="Nome">Nome:</label>
                 <input required="required" type="text" class="form-control" id="Nome" name="Nome" placeholder="Ex.: João" maxlength="50">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Sobrenome">Sobrenome:</label>
+                <input required="required" type="text" class="form-control" id="Sobrenome" name="Sobrenome" placeholder="Ex.: da Silva" maxlength="255">
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="Sobrenome">Sobrenome:</label>
-                <input required="required" type="text" class="form-control" id="Sobrenome" name="Sobrenome" placeholder="Ex.: da Silva" maxlength="255">
+                <label for="CPF">CPF:</label>
+                <input required="required" type="text" class="form-control" id="CPF" name="CPF" placeholder="Ex.: 010.011.111-00" maxlength="14">
             </div>
         </div>
         <div class="col-md-6">
@@ -21,7 +27,6 @@
                 <input required="required" type="text" class="form-control" id="Nacionalidade" name="Nacionalidade" placeholder="Ex.: brasileira" maxlength="50">
             </div>
         </div>
-
     </div>
     <div class="row">
         <div class="col-md-4">
@@ -74,6 +79,9 @@
 
     <div class="row">
         <div class="col-lg-12">
+            <div class="pull-left">
+                <button type="button" class="btn btn-sm btn-primary" id="btnBeneficiarios">Beneficiários</button>
+            </div>
             <div class="pull-right">
                 <button type="submit" class="btn btn-sm btn-success">Salvar</button>
                 @Html.ActionLink("Voltar", "Index", "Cliente", new { }, new { @class = "btn btn-sm btn-danger" })
@@ -81,5 +89,72 @@
         </div>
     </div>
 
+    <!-- Modal de Beneficiários -->
+    <div class="modal fade" id="modalBeneficiarios" tabindex="-1" role="dialog" aria-labelledby="modalBeneficiariosLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+
+
+
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title mb-0" id="modalBeneficiariosLabel">Beneficiários</h4>
+                </div>
+
+
+
+
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="cpfBeneficiario">CPF:</label>
+                                <input type="text" class="form-control" id="cpfBeneficiario" placeholder="Ex.: 010.011.111-00" maxlength="14">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="nomeBeneficiario">Nome:</label>
+                                <input type="text" class="form-control" id="nomeBeneficiario" placeholder="Ex.: Maria" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="margin-top: 25px">
+                                <button type="button" class="btn btn-sm btn-success mb-1" id="btnIncluirBeneficiario">Incluir</button>
+                                <button type="button" class="btn btn-sm btn-warning mb-1" id="btnAlterarBeneficiario" style="display:none;">Alterar</button>
+                                <button type="button" class="btn btn-sm btn-secondary" id="btnCancelarBeneficiario" style="display:none;">Cancelar</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-striped" id="tabelaBeneficiarios">
+                                <thead>
+                                    <tr>
+                                        <th>CPF</th>
+                                        <th>Nome</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpoTabelaBeneficiarios">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="hiddenBeneficiarios" name="Beneficiarios" />
 
 </form>

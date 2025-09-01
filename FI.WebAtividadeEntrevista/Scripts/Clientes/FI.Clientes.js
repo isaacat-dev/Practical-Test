@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-    // Máscara para CPF
     $('#CPF').on('input', function () {
         var value = this.value.replace(/\D/g, '');
         value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -8,7 +7,6 @@
         this.value = value;
     });
 
-    // Validação de CPF
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, '');
         if (cpf.length != 11 ||
@@ -55,7 +53,6 @@
             }
             $(this).data('submitting', true);
 
-            // Validação do CPF
             var cpf = $('#CPF').val();
             if (!validarCPF(cpf)) {
                 $(this).data('submitting', false);
@@ -63,7 +60,6 @@
                 return false;
             }
 
-            // Coleta os beneficiários
             var beneficiariosData = typeof beneficiarios !== 'undefined' ? beneficiarios.map(b => ({
                 Id: b.id || 0,
                 CPF: b.cpf,

@@ -55,17 +55,17 @@ $(document).ready(function () {
         var nome = $('#nomeBeneficiario').val();
 
         if (!cpf || !nome) {
-            ModalDialog("Erro de validação", "Por favor, preencha todos os campos");
+            ModalDialog("Erro de validaÃ§Ã£o", "Por favor, preencha todos os campos");
             return;
         }
 
         if (!validarCPF(cpf)) {
-            ModalDialog("Erro de validação", "CPF inválido");
+            ModalDialog("Erro de validaÃ§Ã£o", "CPF invÃ¡lido");
             return;
         }
 
         if (beneficiarios.some(b => b.cpf === cpf)) {
-            ModalDialog("Erro de validação", "CPF já cadastrado para este cliente");
+            ModalDialog("Erro de validaÃ§Ã£o", "CPF jÃ¡ cadastrado para este cliente");
             return;
         }
 
@@ -85,17 +85,17 @@ $(document).ready(function () {
         var nome = $('#nomeBeneficiario').val();
 
         if (!cpf || !nome) {
-            ModalDialog("Erro de validação", "Por favor, preencha todos os campos");
+            ModalDialog("Erro de validaÃ§Ã£o", "Por favor, preencha todos os campos");
             return;
         }
 
         if (!validarCPF(cpf)) {
-            ModalDialog("Erro de validação", "CPF inválido");
+            ModalDialog("Erro de validaÃ§Ã£o", "CPF invÃ¡lido");
             return;
         }
 
         if (beneficiarios.some(b => b.cpf === cpf && b !== beneficiarioEditando)) {
-            ModalDialog("Erro de validação", "CPF já cadastrado para este cliente");
+            ModalDialog("Erro de validaÃ§Ã£o", "CPF jÃ¡ cadastrado para este cliente");
             return;
         }
 
@@ -121,7 +121,6 @@ $(document).ready(function () {
         atualizarTabelaBeneficiarios();
     }
 
-    // Função para atualizar tabela
     window.atualizarTabelaBeneficiarios = function() {
         var tbody = $('#corpoTabelaBeneficiarios');
         tbody.empty();
@@ -139,13 +138,11 @@ $(document).ready(function () {
         });
     }
 
-    // Função para limpar campos
     function limparCamposBeneficiario() {
         $('#cpfBeneficiario').val('');
         $('#nomeBeneficiario').val('');
     }
 
-    // Função para cancelar edição
     function cancelarEdicaoBeneficiario() {
         beneficiarioEditando = null;
         limparCamposBeneficiario();
@@ -154,7 +151,6 @@ $(document).ready(function () {
         $('#btnCancelarBeneficiario').hide();
     }
 
-    // Função global para editar beneficiário
     window.editarBeneficiario = function (index) {
         beneficiarioEditando = beneficiarios[index];
         $('#cpfBeneficiario').val(beneficiarioEditando.cpf);
@@ -164,9 +160,8 @@ $(document).ready(function () {
         $('#btnCancelarBeneficiario').show();
     };
 
-    // Função global para excluir beneficiário
     window.excluirBeneficiario = function (index) {
-        if (confirm('Deseja realmente excluir este beneficiário?')) {
+        if (confirm('Deseja realmente excluir este beneficiÃ¡rio?')) {
             beneficiarios.splice(index, 1);
             atualizarTabelaBeneficiarios();
         }

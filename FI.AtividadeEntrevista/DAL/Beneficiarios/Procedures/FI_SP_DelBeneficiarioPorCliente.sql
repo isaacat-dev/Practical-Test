@@ -1,0 +1,7 @@
+CREATE PROCEDURE [dbo].[FI_SP_DelBeneficiarioPorCliente]
+    @IdCliente BIGINT
+AS
+BEGIN
+    DELETE FROM BENEFICIARIOS WHERE IDCLIENTE = @IdCliente
+END
+GO

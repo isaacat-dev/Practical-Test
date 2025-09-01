@@ -1,4 +1,4 @@
-﻿using FI.AtividadeEntrevista.BLL;
+using FI.AtividadeEntrevista.BLL;
 using WebAtividadeEntrevista.Models;
 using System;
 using System.Collections.Generic;
@@ -45,24 +45,34 @@ namespace WebAtividadeEntrevista.Controllers
             }
             else
             {
-                model.Id = bo.Incluir(new Cliente()
-                {
-                    CEP = model.CEP,
-                    Cidade = model.Cidade,
-                    CPF = CpfValidador.RemoverFormatacao(model.CPF),
-                    Email = model.Email,
-                    Estado = model.Estado,
-                    Logradouro = model.Logradouro,
-                    Nacionalidade = model.Nacionalidade,
-                    Nome = model.Nome,
-                    Sobrenome = model.Sobrenome,
-                    Telefone = model.Telefone
-                });
-
-                BoBeneficiario boBeneficiario = new BoBeneficiario();
-
                 if (model.Beneficiarios != null && model.Beneficiarios.Any())
                 {
+                    var cpfSemFormatacao = CpfValidador.RemoverFormatacao(model.CPF);
+                    var cpfsBeneficiarios = model.Beneficiarios.Select(b => CpfValidador.RemoverFormatacao(b.CPF)).ToList();
+
+                    if (cpfsBeneficiarios.Contains(cpfSemFormatacao))
+                    {
+                        Response.StatusCode = 400;
+                        return Json("CPF do beneficiário não pode ser igual ao CPF do cliente");
+                    }
+
+                    model.Id = bo.Incluir(new Cliente()
+                    {
+                        CEP = model.CEP,
+                        Cidade = model.Cidade,
+                        CPF = CpfValidador.RemoverFormatacao(model.CPF),
+                        Email = model.Email,
+                        Estado = model.Estado,
+                        Logradouro = model.Logradouro,
+                        Nacionalidade = model.Nacionalidade,
+                        Nome = model.Nome,
+                        Sobrenome = model.Sobrenome,
+                        Telefone = model.Telefone
+                    });
+
+
+                    BoBeneficiario boBeneficiario = new BoBeneficiario();
+
                     foreach (var beneficiario in model.Beneficiarios)
                     {
                         beneficiario.IdCliente = model.Id;
@@ -73,6 +83,22 @@ namespace WebAtividadeEntrevista.Controllers
                             IdCliente = beneficiario.IdCliente
                         });
                     }
+                }
+                else
+                {
+                    model.Id = bo.Incluir(new Cliente()
+                    {
+                        CEP = model.CEP,
+                        Cidade = model.Cidade,
+                        CPF = CpfValidador.RemoverFormatacao(model.CPF),
+                        Email = model.Email,
+                        Estado = model.Estado,
+                        Logradouro = model.Logradouro,
+                        Nacionalidade = model.Nacionalidade,
+                        Nome = model.Nome,
+                        Sobrenome = model.Sobrenome,
+                        Telefone = model.Telefone
+                    });
                 }
 
                 return Json("Cadastro efetuado com sucesso");
